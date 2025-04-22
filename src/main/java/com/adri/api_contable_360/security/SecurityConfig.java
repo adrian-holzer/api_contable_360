@@ -1,0 +1,56 @@
+package com.adri.api_contable_360.security;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.List;
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+
+
+    @Bean
+    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+                .cors()
+                .and()
+                .csrf().disable()
+                .authorizeHttpRequests()
+                .requestMatchers("/api/obligaciones").permitAll()
+                .requestMatchers("/api/obligaciones/upload").permitAll()// Habilita esta ruta para todosd
+                .requestMatchers("/api/obligaciones/{idObligacion}/vencimientos").permitAll()// Habilita esta ruta para todosd
+
+                .anyRequest().authenticated()
+                .and()
+                .httpBasic(); // Todas las demás rutas requieren autenticación
+
+
+        return http.build();
+    }
+
+
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of("capacitor://localhost", "https://localhost", "http://localhost:5173")); // Origen permitido List.of("http://localhost:5173","https://frontspa.netlify.app/")
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
+        config.addExposedHeader("Authorization"); // Permite exponer el header Authorization
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
+}
