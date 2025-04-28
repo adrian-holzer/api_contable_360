@@ -26,9 +26,18 @@ public class SecurityConfig {
                 .and()
                 .csrf().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/api/obligaciones").permitAll()
-                .requestMatchers("/api/obligaciones/upload").permitAll()// Habilita esta ruta para todosd
-                .requestMatchers("/api/obligaciones/{idObligacion}/vencimientos").permitAll()// Habilita esta ruta para todosd
+                .requestMatchers(HttpMethod.GET,"/api/obligaciones").permitAll()
+                .requestMatchers(HttpMethod.POST,"/api/obligaciones/upload").permitAll()// Habilita esta ruta para todosd
+                .requestMatchers(HttpMethod.GET,"/api/obligaciones/{idObligacion}/vencimientos").permitAll()// Habilita esta ruta para todosd
+                .requestMatchers(HttpMethod.POST,"/api/obligaciones").permitAll()
+                .requestMatchers(HttpMethod.GET,"/api/obligaciones/{idObligacion}").permitAll()
+                .requestMatchers(HttpMethod.PUT,"/api/obligaciones").permitAll()
+
+
+                /// Vencimientos
+
+                .requestMatchers(HttpMethod.GET,"/api/{idVencimiento}").permitAll()
+
 
                 .anyRequest().authenticated()
                 .and()

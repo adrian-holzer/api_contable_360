@@ -4,6 +4,7 @@ import com.adri.api_contable_360.models.Obligacion;
 import com.adri.api_contable_360.models.Vencimiento;
 import com.adri.api_contable_360.repositories.ObligacionRepository;
 import com.adri.api_contable_360.repositories.VencimientoRepository;
+import jakarta.transaction.Transactional;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -151,7 +152,9 @@ public class ObligacionService {
     }
 
 
-
+    public Obligacion findById(Long id) {
+        return obligacionRepository.findById(id).orElse(null);
+    }
 
 
     public List<Vencimiento> listarVencimientosPorObligacion(Long idObligacion) {
@@ -163,6 +166,11 @@ public class ObligacionService {
     }
 
 
+
+    @Transactional
+    public Obligacion crearObligacion(Obligacion obligacion) {
+        return obligacionRepository.save(obligacion);
+    }
 
 
 
