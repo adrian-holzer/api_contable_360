@@ -5,6 +5,7 @@ import com.adri.api_contable_360.models.Obligacion;
 import com.adri.api_contable_360.models.Vencimiento;
 import com.adri.api_contable_360.repositories.ObligacionRepository;
 import com.adri.api_contable_360.repositories.VencimientoRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +25,10 @@ public class VencimientoService {
         return vencimientoRepository.findById(id).orElse(null);
     }
 
-
+    @Transactional
+    public void eliminarVencimientosPorObligacion(Obligacion obligacion) {
+        vencimientoRepository.deleteByObligacion(obligacion);
+    }
 
 
 

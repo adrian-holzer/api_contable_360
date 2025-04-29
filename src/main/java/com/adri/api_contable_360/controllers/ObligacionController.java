@@ -6,6 +6,7 @@ import com.adri.api_contable_360.models.Vencimiento;
 import com.adri.api_contable_360.repositories.ObligacionRepository;
 import com.adri.api_contable_360.repositories.VencimientoRepository;
 import com.adri.api_contable_360.services.ObligacionService;
+import com.adri.api_contable_360.services.VencimientoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,10 @@ public class ObligacionController {
 
     @Autowired
     private ObligacionService obligacionService;
+
+    @Autowired
+    private VencimientoService vencimientoService;
+
 
     @Autowired
     private ObligacionRepository obligacionRepository;
@@ -73,7 +78,7 @@ public class ObligacionController {
         Obligacion nuevaObligacion = new Obligacion();
         nuevaObligacion.setNombre(obligacionRequest.getNombre());
         nuevaObligacion.setDescripcion(obligacionRequest.getDescripcion());
-        nuevaObligacion.setObservaciones(obligacionRequest.getObservacionesObligacion());
+        nuevaObligacion.setObservaciones(obligacionRequest.getObservaciones());
 
         List<Vencimiento> vencimientos = obligacionRequest.getVencimientos().stream()
                 .map(vencimientoDTO -> {
@@ -92,8 +97,39 @@ public class ObligacionController {
     }
 
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Obligacion> modificarObligacion(@PathVariable Long id, @RequestBody ObligacionRequestDTO obligacionRequest) {
+        Obligacion obligacionExistente = obligacionService.findById(id);
 
+        if (obligacionExistente == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
 
+        obligacionExistente.setNombre(obligacionRequest.getNombre());
+        obligacionExistente.setDescripcion(obligacionRequest.getDescripcion());
+        obligacionExistente.setObservaciones(obligacionRequest.getObservaciones());
+
+        // Eliminar los vencimientos existentes para reemplazarlos
+        List<Vencimiento> vencimientosExistentes = obligacionExistente.getVencimientos();
+        if (vencimientosExistentes != null) {
+            vencimientoService.eliminarVencimientosPorObligacion(obligacionExistente);
+        }
+
+        List<Vencimiento> nuevosVencimientos = obligacionRequest.getVencimientos().stream()
+                .map(vencimientoDTO -> {
+                    Vencimiento vencimiento = new Vencimiento();
+                    vencimiento.setMes(vencimientoDTO.getMes());
+                    vencimiento.setTerminacionCuit(vencimientoDTO.getTerminacionCuit());
+                    vencimiento.setDia(vencimientoDTO.getDia());
+                    vencimiento.setObligacion(obligacionExistente);
+                    return vencimiento;
+                }).collect(Collectors.toList());
+
+        obligacionExistente.setVencimientos(nuevosVencimientos);
+
+        Obligacion obligacionActualizada = obligacionService.crearObligacion(obligacionExistente);
+        return new ResponseEntity<>(obligacionActualizada, HttpStatus.OK);
+    }
 
 
 

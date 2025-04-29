@@ -5,7 +5,7 @@ import java.util.List;
 public class ObligacionRequestDTO {
     private String nombre;
     private String descripcion;
-    private String observacionesObligacion; // Para evitar confusión con las observaciones del vencimiento
+    private String observaciones; // Para evitar confusión con las observaciones del vencimiento
     private List<VencimientoDTO> vencimientos;
 
     // Getters y setters
@@ -26,12 +26,12 @@ public class ObligacionRequestDTO {
         this.descripcion = descripcion;
     }
 
-    public String getObservacionesObligacion() {
-        return observacionesObligacion;
+    public String getObservaciones() {
+        return observaciones;
     }
 
     public void setObservacionesObligacion(String observacionesObligacion) {
-        this.observacionesObligacion = observacionesObligacion;
+        this.observaciones = observacionesObligacion;
     }
 
     public List<VencimientoDTO> getVencimientos() {

@@ -31,12 +31,26 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET,"/api/obligaciones/{idObligacion}/vencimientos").permitAll()// Habilita esta ruta para todosd
                 .requestMatchers(HttpMethod.POST,"/api/obligaciones").permitAll()
                 .requestMatchers(HttpMethod.GET,"/api/obligaciones/{idObligacion}").permitAll()
-                .requestMatchers(HttpMethod.PUT,"/api/obligaciones").permitAll()
-
+                .requestMatchers(HttpMethod.PUT,"/api/obligaciones/{id}").permitAll()
 
                 /// Vencimientos
 
                 .requestMatchers(HttpMethod.GET,"/api/{idVencimiento}").permitAll()
+
+
+
+                // Asignaciones
+                .requestMatchers("/api/asignaciones").permitAll()
+
+
+                // Clientes
+
+                .requestMatchers("/api/clientes").permitAll()
+
+                // Contactos
+
+                .requestMatchers("/api/contactos").permitAll()
+
 
 
                 .anyRequest().authenticated()
