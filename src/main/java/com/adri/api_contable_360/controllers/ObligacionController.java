@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.Year;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -87,8 +89,18 @@ public class ObligacionController {
                     vencimiento.setTerminacionCuit(vencimientoDTO.getTerminacionCuit());
                     vencimiento.setDia(vencimientoDTO.getDia());
                     vencimiento.setObligacion(nuevaObligacion);
+                    try {
+                        vencimiento.setFechaVencimiento(LocalDate.of(Year.now().getValue(), vencimiento.getMes(), vencimiento.getDia()));
+                    } catch (Exception e) {
+                        // Manejar casos de fechas inválidas (ej: día 31 en mes de 30)
+                        vencimiento.setFechaVencimiento(null); // O podrías usar otra estrategia
+                        System.err.println("Fecha de vencimiento inválida para obligación " + nuevaObligacion.getId() + ": Mes=" + vencimiento.getMes() + ", Día=" + vencimiento.getDia());
+                    }
+
+
                     return vencimiento;
                 }).collect(Collectors.toList());
+
 
         nuevaObligacion.setVencimientos(vencimientos);
 

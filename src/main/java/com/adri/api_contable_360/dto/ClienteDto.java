@@ -1,42 +1,29 @@
-package com.adri.api_contable_360.models;
+package com.adri.api_contable_360.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
 
-import java.util.List;
-
-@Entity
-public class Cliente {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class ClienteDto {
     private Long idCliente;
-
     private String cuit;
     private String actividadAfip;
     private String domicilioLegal;
     private String domicilioFiscal;
     private String nombre;
-    private Integer terminacionCuit; // Nuevo campo
+    private Integer terminacionCuit; // Nuevo campo en el DTO
 
-    @OneToMany(mappedBy = "cliente")
-    @JsonIgnore
-    private List<Contacto> contactos;
-
-    @OneToMany(mappedBy = "cliente")
-    @JsonIgnore
-    private List<Asignacion> asignaciones;
-
-
-
-    public Integer getTerminacionCuit() {
-        return terminacionCuit;
+    public ClienteDto() {
     }
 
-    public void setTerminacionCuit(Integer terminacionCuit) {
+    public ClienteDto(Long idCliente, String cuit, String actividadAfip, String domicilioLegal, String domicilioFiscal, String nombre, Integer terminacionCuit) {
+        this.idCliente = idCliente;
+        this.cuit = cuit;
+        this.actividadAfip = actividadAfip;
+        this.domicilioLegal = domicilioLegal;
+        this.domicilioFiscal = domicilioFiscal;
+        this.nombre = nombre;
         this.terminacionCuit = terminacionCuit;
     }
 
+    // Getters y setters (incluyendo para terminacionCuit)
     public Long getIdCliente() {
         return idCliente;
     }
@@ -77,14 +64,6 @@ public class Cliente {
         this.domicilioFiscal = domicilioFiscal;
     }
 
-    public List<Contacto> getContactos() {
-        return contactos;
-    }
-
-    public void setContactos(List<Contacto> contactos) {
-        this.contactos = contactos;
-    }
-
     public String getNombre() {
         return nombre;
     }
@@ -93,11 +72,11 @@ public class Cliente {
         this.nombre = nombre;
     }
 
-    public List<Asignacion> getAsignaciones() {
-        return asignaciones;
+    public Integer getTerminacionCuit() {
+        return terminacionCuit;
     }
 
-    public void setAsignaciones(List<Asignacion> asignaciones) {
-        this.asignaciones = asignaciones;
+    public void setTerminacionCuit(Integer terminacionCuit) {
+        this.terminacionCuit = terminacionCuit;
     }
 }

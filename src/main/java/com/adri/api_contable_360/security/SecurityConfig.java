@@ -35,17 +35,24 @@ public class SecurityConfig {
 
                 /// Vencimientos
 
-                .requestMatchers(HttpMethod.GET,"/api/{idVencimiento}").permitAll()
-
+                .requestMatchers(HttpMethod.GET,"/api/vencimientos/{idVencimiento}").permitAll()
 
 
                 // Asignaciones
-                .requestMatchers("/api/asignaciones").permitAll()
+                .requestMatchers(HttpMethod.GET,"/api/asignaciones").permitAll()
+                .requestMatchers(HttpMethod.POST,"/api/asignaciones").permitAll()
+
+
+                .requestMatchers("/api/asignaciones/{idAsignacion}/vencimientos").permitAll()
+                .requestMatchers("/api/asignaciones/{idAsignacion}").permitAll()
+
 
 
                 // Clientes
 
                 .requestMatchers("/api/clientes").permitAll()
+                .requestMatchers("/api/clientes/{idCliente}").permitAll()
+
 
                 // Contactos
 

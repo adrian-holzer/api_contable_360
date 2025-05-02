@@ -1,10 +1,13 @@
 package com.adri.api_contable_360.services;
 
-import com.adri.api_contable_360.models.Asignacion;
+import com.adri.api_contable_360.models.*;
 import com.adri.api_contable_360.repositories.AsignacionRepository;
+import com.adri.api_contable_360.repositories.AsignacionVencimientoRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,6 +17,10 @@ public class AsignacionService {
     @Autowired
     private AsignacionRepository asignacionRepository;
 
+
+    @Autowired
+    private AsignacionVencimientoRepository asignacionVencimientoRepository;
+
     public List<Asignacion> getAllAsignaciones() {
         return asignacionRepository.findAll();
     }
@@ -22,8 +29,33 @@ public class AsignacionService {
         return asignacionRepository.findById(id);
     }
 
-    public Asignacion saveAsignacion(Asignacion asignacion) {
+    public Asignacion save(Asignacion asignacion) {
         return asignacionRepository.save(asignacion);
+    }
+
+
+    @Transactional
+    public void crearAsignacionesVencimiento(Asignacion asignacion, List<Vencimiento> vencimientos) {
+        for (Vencimiento vencimiento : vencimientos) {
+            AsignacionVencimiento asignacionVencimiento = new AsignacionVencimiento();
+            asignacionVencimiento.setAsignacion(asignacion);
+            asignacionVencimiento.setVencimiento(vencimiento);
+            asignacionVencimientoRepository.save(asignacionVencimiento);
+        }
+    }
+
+    // El método crearAsignacionesParaCliente ya no es estrictamente necesario como estaba antes
+    // pero podría mantenerse si tienes otros casos de uso.
+    // Aquí lo modificamos para que solo guarde la asignación.
+    public Asignacion crearAsignacionParaCliente(Asignacion asignacion) {
+        return asignacionRepository.save(asignacion);
+    }
+
+    public List<AsignacionVencimiento> getVencimientosDeAsignacion(Long asignacionId) {
+
+        Asignacion a = asignacionRepository.findById(asignacionId).orElse(null);
+
+        return asignacionVencimientoRepository.findByAsignacion(a);
     }
 
     public void deleteAsignacion(Long id) {

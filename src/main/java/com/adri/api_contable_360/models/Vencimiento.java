@@ -2,6 +2,8 @@ package com.adri.api_contable_360.models;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
+
 @Entity
 public class Vencimiento {
     @Id
@@ -16,10 +18,17 @@ public class Vencimiento {
     private Integer mes;
     private Integer dia;
     private String observaciones;
+    private LocalDate fechaVencimiento; // Nuevo campo para la fecha de vencimiento
 
     // Getters y setters
 
+    public LocalDate getFechaVencimiento() {
+        return fechaVencimiento;
+    }
 
+    public void setFechaVencimiento(LocalDate fechaVencimiento) {
+        this.fechaVencimiento = fechaVencimiento;
+    }
     public Long getId() {
         return id;
     }
