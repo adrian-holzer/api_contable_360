@@ -36,6 +36,7 @@ public class SecurityConfig {
                 /// Vencimientos
 
                 .requestMatchers(HttpMethod.GET,"/api/vencimientos/{idVencimiento}").permitAll()
+                .requestMatchers(HttpMethod.GET,"/api/vencimientos").permitAll()
 
 
                 // Asignaciones
@@ -57,6 +58,11 @@ public class SecurityConfig {
                 // Contactos
 
                 .requestMatchers("/api/contactos").permitAll()
+
+
+                // Asignaciones Vencimientos
+                .requestMatchers(HttpMethod.GET,"/api/asignaciones-vencimientos").permitAll()
+                .requestMatchers(HttpMethod.GET,"/api/asignaciones-vencimientos/cliente/{idCliente}").permitAll()
 
 
 

@@ -48,41 +48,63 @@ public class AsignacionController {
     }
 
 
+
     @PostMapping
-    public ResponseEntity<List<Asignacion>> crearAsignaciones(@RequestBody AsignacionDto asignacionRequest) {
+    public ResponseEntity<?> crearAsignaciones(@RequestBody AsignacionDto asignacionRequest) {
         Cliente cliente = clienteService.findById(asignacionRequest.getIdCliente());
 
         if (cliente == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Cliente no encontrado", HttpStatus.NOT_FOUND);
         }
 
         List<Long> idsObligaciones = asignacionRequest.getIdsObligaciones();
         List<Asignacion> asignacionesCreadas = new ArrayList<>();
+        List<String> errores = new ArrayList<>();
 
         for (Long idObligacion : idsObligaciones) {
             Obligacion obligacion = obligacionService.findById(idObligacion);
             if (obligacion != null) {
-                Asignacion nuevaAsignacion = new Asignacion();
-                nuevaAsignacion.setCliente(cliente);
-                nuevaAsignacion.setObligacion(obligacion);
-                nuevaAsignacion.setObservacion(asignacionRequest.getObservacion());
-
-                Asignacion asignacionGuardada = asignacionService.save(nuevaAsignacion);
-                asignacionesCreadas.add(asignacionGuardada);
-
-                // Crear las AsignacionVencimiento para esta asignación
-                List<Vencimiento> vencimientos = vencimientoService.obtenerVencimientosPorObligacionYTerminacionCuit(
-                        asignacionGuardada.getIdAsignacion()
+                // Verificar si ya existe una asignación para este cliente y obligación
+                List<Asignacion> asignacionesExistentes = asignacionService.findByClienteIdAndObligacionId(
+                        cliente,
+                        obligacion
                 );
-                asignacionService.crearAsignacionesVencimiento(asignacionGuardada, vencimientos);
 
+                if (asignacionesExistentes.isEmpty()) {
+                    Asignacion nuevaAsignacion = new Asignacion();
+                    nuevaAsignacion.setCliente(cliente);
+                    nuevaAsignacion.setObligacion(obligacion);
+                    nuevaAsignacion.setObservacion(asignacionRequest.getObservacion());
+
+                    Asignacion asignacionGuardada = asignacionService.save(nuevaAsignacion);
+                    asignacionesCreadas.add(asignacionGuardada);
+
+                    // Crear las AsignacionVencimiento para esta asignación
+                    // Asumo que tienes un método en VencimientoService para esto
+                    List<Vencimiento> vencimientos = vencimientoService.obtenerVencimientosPorObligacionYTerminacionCuit(
+                            asignacionGuardada.getIdAsignacion() // Aquí deberías usar los IDs de Obligacion y Cliente
+                    );
+                    asignacionService.crearAsignacionesVencimiento(asignacionGuardada, vencimientos);
+
+                } else {
+                    errores.add("Ya existe una asignación para el Cliente ID: " + cliente.getIdCliente() +
+                            " y la Obligación ID: " + obligacion.getId());
+                }
             } else {
-                System.err.println("No se encontró la obligación con ID: " + idObligacion);
+                errores.add("No se encontró la obligación con ID: " + idObligacion);
             }
         }
 
-        return new ResponseEntity<>(asignacionesCreadas, HttpStatus.CREATED);
+        if (!errores.isEmpty() && asignacionesCreadas.isEmpty()) {
+            return new ResponseEntity<>(errores, HttpStatus.CONFLICT);
+        } else if (!errores.isEmpty()) {
+            // Si se crearon algunas asignaciones pero hubo duplicados
+            return new ResponseEntity<>(HttpStatus.MULTI_STATUS); // Puedes personalizar el cuerpo de la respuesta si lo deseas
+        } else {
+            return new ResponseEntity<>(asignacionesCreadas, HttpStatus.CREATED);
+        }
     }
+
 
 
 

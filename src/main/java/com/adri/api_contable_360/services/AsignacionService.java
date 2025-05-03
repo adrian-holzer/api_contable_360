@@ -58,6 +58,12 @@ public class AsignacionService {
         return asignacionVencimientoRepository.findByAsignacion(a);
     }
 
+
+    public List<Asignacion> findByClienteIdAndObligacionId(Cliente c, Obligacion o) {
+
+        return asignacionRepository.findByClienteAndObligacion(c, o);
+    }
+
     public void deleteAsignacion(Long id) {
         asignacionRepository.deleteById(id);
     }

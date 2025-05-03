@@ -1,8 +1,10 @@
 package com.adri.api_contable_360.controllers;
 
 
+import com.adri.api_contable_360.models.AsignacionVencimiento;
 import com.adri.api_contable_360.models.Obligacion;
 import com.adri.api_contable_360.models.Vencimiento;
+import com.adri.api_contable_360.repositories.AsignacionVencimientoRepository;
 import com.adri.api_contable_360.repositories.ObligacionRepository;
 import com.adri.api_contable_360.repositories.VencimientoRepository;
 import com.adri.api_contable_360.services.ObligacionService;
@@ -31,6 +33,13 @@ public class VencimientoController {
     @Autowired
     private ObligacionRepository obligacionRepository;
 
+
+
+    @Autowired
+    private AsignacionVencimientoRepository asignacionVencimientoRepository;
+
+
+
     @Autowired
     private VencimientoRepository vencimientoRepository;
 
@@ -50,6 +59,20 @@ public class VencimientoController {
 
 
 
+    // Vencimientos por Asignacion
+
+    // Vencimientos por Cliente
+
+
+    // Todos los Vencimeintos
+
+
+    @GetMapping("")
+    public ResponseEntity<?>  listarTodosLasAsignacionesVencimientos() {
+        List<AsignacionVencimiento> listAsignacionVencimientos = asignacionVencimientoRepository.findAll();
+
+            return new ResponseEntity<>(listAsignacionVencimientos, HttpStatus.OK);
+        }
 
 
 

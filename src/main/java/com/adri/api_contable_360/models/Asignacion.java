@@ -24,6 +24,7 @@ public class Asignacion {
 
 
     @OneToMany(mappedBy = "asignacion", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<AsignacionVencimiento> asignacionesVencimientos;
 
     public Long getIdAsignacion() {
