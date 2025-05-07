@@ -53,6 +53,8 @@ public class SecurityConfig {
 
                 .requestMatchers("/api/clientes").permitAll()
                 .requestMatchers("/api/clientes/{idCliente}").permitAll()
+                .requestMatchers(HttpMethod.POST,"/api/clientes/asignar/{idCliente}/usuario/{idUsuario}").permitAll()
+                .requestMatchers(HttpMethod.GET,"/api/clientes/usuario/{idUsuario}").permitAll()
 
 
                 // Contactos
@@ -64,6 +66,9 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET,"/api/asignaciones-vencimientos").permitAll()
                 .requestMatchers(HttpMethod.GET,"/api/asignaciones-vencimientos/cliente/{idCliente}").permitAll()
 
+
+                // Usuarios
+                .requestMatchers(HttpMethod.POST,"/api/usuarios").permitAll()
 
 
                 .anyRequest().authenticated()

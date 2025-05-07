@@ -36,4 +36,20 @@ public class AsignacionVencimientoController {
         return new ResponseEntity<>(listAsignacionVencimientos, HttpStatus.OK);
     }
 
+
+
+    // AsignacionVencimiento por id
+
+    @GetMapping("/api/asignaciones-vencimientos/{idAsignacionVencimiento}")
+    public ResponseEntity<AsignacionVencimiento> listarTodosLasAsignacionesVencimientosPorCliente(@PathVariable Long idAsignacionVencimiento) {
+        AsignacionVencimiento asignacionVencimiento = asignacionVencimientoRepository.findById(idAsignacionVencimiento);
+
+        if (listAsignacionVencimientos.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT); // O HttpStatus.NOT_FOUND si prefieres
+        }
+
+        return new ResponseEntity<>(listAsignacionVencimientos, HttpStatus.OK);
+    }
+
+
 }

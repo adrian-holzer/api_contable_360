@@ -27,7 +27,9 @@ public class Cliente {
     @JsonIgnore
     private List<Asignacion> asignaciones;
 
-
+    @ManyToOne
+    @JoinColumn(name = "idUsuarioResponsable")
+    private Usuario usuarioResponsable = null;
 
     public Integer getTerminacionCuit() {
         return terminacionCuit;
@@ -99,5 +101,15 @@ public class Cliente {
 
     public void setAsignaciones(List<Asignacion> asignaciones) {
         this.asignaciones = asignaciones;
+    }
+
+
+
+    public Usuario getUsuarioResponsable() {
+        return usuarioResponsable;
+    }
+
+    public void setUsuarioResponsable(Usuario usuarioResponsable) {
+        this.usuarioResponsable = usuarioResponsable;
     }
 }

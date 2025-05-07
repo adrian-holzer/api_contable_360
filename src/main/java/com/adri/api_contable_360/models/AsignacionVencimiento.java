@@ -2,6 +2,8 @@ package com.adri.api_contable_360.models;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
+
 @Entity
 public class AsignacionVencimiento {
 
@@ -17,8 +19,16 @@ public class AsignacionVencimiento {
     @JoinColumn(name = "idVencimiento")
     private Vencimiento vencimiento;
 
+    @ManyToOne
+    @JoinColumn(name = "idUsuarioFinalizo")
+    private Usuario usuarioFinalizo;
+
+
     @Enumerated(EnumType.STRING)
     private EstadoAsignacion estado = EstadoAsignacion.PENDIENTE;
+
+    private LocalDate fechaFinalizacion;
+
 
     private String observacion;
 
@@ -63,5 +73,22 @@ public class AsignacionVencimiento {
 
     public void setObservacion(String observacion) {
         this.observacion = observacion;
+    }
+
+
+    public Usuario getUsuarioFinalizo() {
+        return usuarioFinalizo;
+    }
+
+    public void setUsuarioFinalizo(Usuario usuarioFinalizo) {
+        this.usuarioFinalizo = usuarioFinalizo;
+    }
+
+    public LocalDate getFechaFinalizacion() {
+        return fechaFinalizacion;
+    }
+
+    public void setFechaFinalizacion(LocalDate fechaFinalizacion) {
+        this.fechaFinalizacion = fechaFinalizacion;
     }
 }

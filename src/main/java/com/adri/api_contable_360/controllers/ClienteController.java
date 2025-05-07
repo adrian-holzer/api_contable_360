@@ -2,7 +2,10 @@ package com.adri.api_contable_360.controllers;
 
 import com.adri.api_contable_360.dto.ClienteDto;
 import com.adri.api_contable_360.models.Cliente;
+import com.adri.api_contable_360.models.Usuario;
+import com.adri.api_contable_360.repositories.ClienteRepository;
 import com.adri.api_contable_360.services.ClienteService;
+import com.adri.api_contable_360.services.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +20,13 @@ public class ClienteController {
 
     @Autowired
     private ClienteService clienteService;
+
+    @Autowired
+    private ClienteRepository clienteRepository;
+
+    @Autowired
+    private UsuarioService usuarioService;
+
 
     @GetMapping
     public ResponseEntity<List<Cliente>> getAllClientes() {
@@ -67,5 +77,23 @@ public class ClienteController {
     public ResponseEntity<HttpStatus> deleteCliente(@PathVariable Long id) {
         clienteService.deleteCliente(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+
+
+    @PostMapping("/asignar/{idCliente}/usuario/{idUsuario}")
+    public ResponseEntity<String> asignarClienteAUsuario(@PathVariable Long idCliente, @PathVariable Long idUsuario) {
+        return clienteService.asignarClienteAUsuario(idCliente, idUsuario);
+    }
+
+
+    @GetMapping("/usuario/{idUsuario}")
+    public ResponseEntity<List<Cliente>> obtenerClientesPorUsuario( @PathVariable Long idUsuario) {
+        Optional<Usuario> usuarioOptional = usuarioService.findById(idUsuario);
+        if (usuarioOptional.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        List<Cliente> clientes = clienteRepository.findByUsuarioResponsable(usuarioOptional.get());
+        return new ResponseEntity<>(clientes, HttpStatus.OK);
     }
 }

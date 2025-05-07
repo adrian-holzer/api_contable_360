@@ -2,8 +2,11 @@ package com.adri.api_contable_360.services;
 
 
 import com.adri.api_contable_360.models.Cliente;
+import com.adri.api_contable_360.models.Usuario;
 import com.adri.api_contable_360.repositories.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,6 +17,9 @@ public class ClienteService {
 
     @Autowired
     private ClienteRepository clienteRepository;
+
+    @Autowired
+    private UsuarioService usuarioService;
 
     public List<Cliente> getAllClientes() {
         return clienteRepository.findAll();
@@ -43,6 +49,35 @@ public class ClienteService {
         }
         return clienteRepository.save(cliente);
     }
+
+
+
+    public ResponseEntity<String> asignarClienteAUsuario(Long idCliente, Long idUsuario) {
+        Optional<Cliente> clienteOptional = clienteRepository.findById(idCliente);
+        Optional<Usuario> usuarioOptional = usuarioService.findById(idUsuario);
+
+        if (clienteOptional.isEmpty()) {
+            return new ResponseEntity<>("Cliente no encontrado", HttpStatus.NOT_FOUND);
+        }
+
+        if (usuarioOptional.isEmpty()) {
+            return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
+        }
+
+        Cliente cliente = clienteOptional.get();
+
+        if (cliente.getUsuarioResponsable() == null) {
+            cliente.setUsuarioResponsable(usuarioOptional.get());
+            clienteRepository.save(cliente);
+            return new ResponseEntity<>("Cliente asignado al usuario exitosamente", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("El cliente ya tiene un usuario asignado", HttpStatus.CONFLICT);
+        }
+    }
+
+
+
+
 
     public void deleteCliente(Long id) {
         clienteRepository.deleteById(id);
