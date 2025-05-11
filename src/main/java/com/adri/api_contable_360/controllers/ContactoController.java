@@ -1,14 +1,19 @@
 package com.adri.api_contable_360.controllers;
 
+import com.adri.api_contable_360.models.Cliente;
 import com.adri.api_contable_360.models.Contacto;
+import com.adri.api_contable_360.services.ClienteService;
 import com.adri.api_contable_360.services.ContactoService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/contactos")
@@ -16,6 +21,9 @@ public class ContactoController {
 
     @Autowired
     private ContactoService contactoService;
+
+    @Autowired
+    private ClienteService clienteService;
 
     @GetMapping
     public ResponseEntity<List<Contacto>> getAllContactos() {
@@ -30,10 +38,24 @@ public class ContactoController {
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @PostMapping
-    public ResponseEntity<Contacto> createContacto(@RequestBody Contacto contacto) {
-        Contacto savedContacto = contactoService.saveContacto(contacto);
-        return new ResponseEntity<>(savedContacto, HttpStatus.CREATED);
+    @PostMapping("/clientes/{idCliente}")
+    public ResponseEntity<?> crearContacto(@PathVariable Long idCliente, @Valid @RequestBody Contacto contacto, BindingResult result) {
+        if (result.hasErrors()) {
+            List<String> errors = result.getFieldErrors().stream()
+                    .map(err -> err.getField() + ": " + err.getDefaultMessage())
+                    .collect(Collectors.toList());
+            return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+        }
+
+        Cliente cliente = clienteService.findById(idCliente);
+
+        if (cliente==null) {
+            return new ResponseEntity<>("Cliente no encontrado", HttpStatus.NOT_FOUND);
+        }
+
+        contacto.setCliente(cliente);
+        Contacto nuevoContacto = contactoService.saveContacto(contacto);
+        return new ResponseEntity<>(nuevoContacto, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")

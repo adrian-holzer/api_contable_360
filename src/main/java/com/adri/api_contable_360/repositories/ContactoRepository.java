@@ -6,5 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ContactoRepository extends JpaRepository<Contacto, Long> {
-    // Métodos adicionales si necesitas consultas personalizadas
+    // Spring Data JPA proporciona los métodos básicos como save(), findById(), findAll(), deleteById(), etc.
+    // Puedes agregar métodos de consulta personalizados si los necesitas
 }

@@ -16,6 +16,8 @@ public class Usuario {
 
     private String nombreUsuario;
     private String nombreApellido;
+
+    @JsonIgnore
     private String contrasena;
     private String correo;
 
@@ -24,6 +26,7 @@ public class Usuario {
     private List<Cliente> clientesResponsables;
 
     @OneToMany(mappedBy = "usuarioFinalizo")
+    @JsonIgnore
     private List<AsignacionVencimiento> asignacionesVencimientosFinalizadas;
 
     // Constructor por defecto (necesario para JPA)

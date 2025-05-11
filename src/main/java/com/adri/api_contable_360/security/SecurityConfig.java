@@ -59,13 +59,19 @@ public class SecurityConfig {
 
                 // Contactos
 
-                .requestMatchers("/api/contactos").permitAll()
+                .requestMatchers(HttpMethod.GET,"/api/contactos").permitAll()
+                .requestMatchers(HttpMethod.GET,"/api/contactos/{id}").permitAll()
+                .requestMatchers(HttpMethod.POST,"/api/contactos/clientes/{idCliente}").permitAll()
+                .requestMatchers(HttpMethod.PUT,"/api/contactos").permitAll()
+                .requestMatchers(HttpMethod.DELETE,"/api/contactos/{id}").permitAll()
 
 
                 // Asignaciones Vencimientos
                 .requestMatchers(HttpMethod.GET,"/api/asignaciones-vencimientos").permitAll()
                 .requestMatchers(HttpMethod.GET,"/api/asignaciones-vencimientos/cliente/{idCliente}").permitAll()
-
+                .requestMatchers(HttpMethod.GET,"/api/asignaciones-vencimientos/{idAsignacionVencimiento}").permitAll()
+                .requestMatchers(HttpMethod.PUT,"/api/asignaciones-vencimientos/{idAsignacionVencimiento}").permitAll()
+                .requestMatchers(HttpMethod.POST,"/api/asignaciones-vencimientos/enviar-notificacion").permitAll()
 
                 // Usuarios
                 .requestMatchers(HttpMethod.POST,"/api/usuarios").permitAll()

@@ -31,4 +31,8 @@ public interface AsignacionVencimientoRepository extends JpaRepository<Asignacio
     List<AsignacionVencimiento> findByCliente_IdOrderByFechaVencimientoAsc(@Param("idCliente") Long idCliente);
 
 
+
+
+
+
 }
