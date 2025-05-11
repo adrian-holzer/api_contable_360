@@ -22,6 +22,8 @@ public class Asignacion {
     @JoinColumn(name = "idObligacion")
     private Obligacion obligacion; // Agregamos la relación con Obligacion
 
+    private boolean activo; // Agregamos la relación con Obligacion
+
 
     @OneToMany(mappedBy = "asignacion", cascade = CascadeType.ALL)
     @JsonIgnore
@@ -68,4 +70,11 @@ public class Asignacion {
         this.asignacionesVencimientos = asignacionesVencimientos;
     }
 
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
+    }
 }

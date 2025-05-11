@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.Year;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -91,6 +93,15 @@ public class ObligacionService {
                                 vencimiento.setTerminacionCuit(j);
                                 vencimiento.setMes(mes);
                                 vencimiento.setDia(terminacionDia);
+
+                                try {
+                                    vencimiento.setFechaVencimiento(LocalDate.of(Year.now().getValue(), vencimiento.getMes(), vencimiento.getDia()));
+                                } catch (Exception e) {
+                                    // Manejar casos de fechas inválidas (ej: día 31 en mes de 30)
+                                    vencimiento.setFechaVencimiento(null); // O podrías usar otra estrategia
+                                    System.err.println("Fecha de vencimiento inválida para obligación " + obligacion.getId() + ": Mes=" + vencimiento.getMes() + ", Día=" + vencimiento.getDia());
+                                }
+
                                 vencimientoRepository.save(vencimiento);
                                 System.out.println("    Guardado vencimiento: Mes=" + mes + ", Terminación=" + j + ", Día=" + terminacionDia); // Log
 

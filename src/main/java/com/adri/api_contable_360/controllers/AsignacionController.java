@@ -56,6 +56,7 @@ public class AsignacionController {
         if (cliente == null) {
             return new ResponseEntity<>("Cliente no encontrado", HttpStatus.NOT_FOUND);
         }
+        System.out.println(asignacionRequest);
 
         List<Long> idsObligaciones = asignacionRequest.getIdsObligaciones();
         List<Asignacion> asignacionesCreadas = new ArrayList<>();
@@ -65,9 +66,10 @@ public class AsignacionController {
             Obligacion obligacion = obligacionService.findById(idObligacion);
             if (obligacion != null) {
                 // Verificar si ya existe una asignación para este cliente y obligación
-                List<Asignacion> asignacionesExistentes = asignacionService.findByClienteIdAndObligacionId(
+                List<Asignacion> asignacionesExistentes = asignacionService.findByClienteIdAndObligacionIdAndActivo(
                         cliente,
-                        obligacion
+                        obligacion,
+                        true
                 );
 
                 if (asignacionesExistentes.isEmpty()) {
@@ -75,6 +77,7 @@ public class AsignacionController {
                     nuevaAsignacion.setCliente(cliente);
                     nuevaAsignacion.setObligacion(obligacion);
                     nuevaAsignacion.setObservacion(asignacionRequest.getObservacion());
+                    nuevaAsignacion.setActivo(true);
 
                     Asignacion asignacionGuardada = asignacionService.save(nuevaAsignacion);
                     asignacionesCreadas.add(asignacionGuardada);
@@ -99,7 +102,7 @@ public class AsignacionController {
             return new ResponseEntity<>(errores, HttpStatus.CONFLICT);
         } else if (!errores.isEmpty()) {
             // Si se crearon algunas asignaciones pero hubo duplicados
-            return new ResponseEntity<>(HttpStatus.MULTI_STATUS); // Puedes personalizar el cuerpo de la respuesta si lo deseas
+            return new ResponseEntity<>(errores,HttpStatus.MULTI_STATUS); // Puedes personalizar el cuerpo de la respuesta si lo deseas
         } else {
             return new ResponseEntity<>(asignacionesCreadas, HttpStatus.CREATED);
         }
@@ -141,4 +144,11 @@ public class AsignacionController {
 
 
 
+    @GetMapping("/cliente/{idCliente}")
+    public ResponseEntity<?> asignacionesPorCliente(@PathVariable Long idCliente) {
+        List <Asignacion> asignaciones = asignacionService.findByClienteAndActivo(idCliente);
+
+        return new ResponseEntity<>(asignaciones, HttpStatus.OK);
+
+    }
 }

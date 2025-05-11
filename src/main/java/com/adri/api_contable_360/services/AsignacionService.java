@@ -3,6 +3,7 @@ package com.adri.api_contable_360.services;
 import com.adri.api_contable_360.models.*;
 import com.adri.api_contable_360.repositories.AsignacionRepository;
 import com.adri.api_contable_360.repositories.AsignacionVencimientoRepository;
+import com.adri.api_contable_360.repositories.ClienteRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,10 @@ public class AsignacionService {
 
     @Autowired
     private AsignacionVencimientoRepository asignacionVencimientoRepository;
+
+
+    @Autowired
+    private ClienteRepository clienteRepository;
 
     public List<Asignacion> getAllAsignaciones() {
         return asignacionRepository.findAll();
@@ -59,12 +64,25 @@ public class AsignacionService {
     }
 
 
-    public List<Asignacion> findByClienteIdAndObligacionId(Cliente c, Obligacion o) {
+    public List<Asignacion> findByClienteIdAndObligacionIdAndActivo(Cliente c, Obligacion o,boolean activo) {
 
-        return asignacionRepository.findByClienteAndObligacion(c, o);
+        return asignacionRepository.findByClienteAndObligacionAndActivo(c, o,activo);
     }
 
     public void deleteAsignacion(Long id) {
         asignacionRepository.deleteById(id);
     }
+
+
+
+    public List<Asignacion> findByClienteAndActivo(Long idCliente) {
+
+        Cliente c = clienteRepository.findById(idCliente).orElse(null);
+
+        if (c!=null){
+            return asignacionRepository.findByClienteAndActivo(c,true);
+
+        }else return null;
+    }
+
 }

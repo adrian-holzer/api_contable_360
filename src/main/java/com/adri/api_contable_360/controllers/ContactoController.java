@@ -38,6 +38,17 @@ public class ContactoController {
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
+    @GetMapping("/cliente/{idCliente}") // Más específico y RESTful
+    public ResponseEntity<?> getContactosByCliente(@PathVariable Long idCliente) {
+        Cliente cliente = clienteService.findById(idCliente);
+
+        if (cliente == null) {
+            return new ResponseEntity<>("Cliente no encontrado", HttpStatus.NOT_FOUND);
+        }
+
+        List<Contacto> contactos = cliente.getContactos(); // Obtener la lista directamente
+        return new ResponseEntity<>(contactos, HttpStatus.OK);
+    }
     @PostMapping("/clientes/{idCliente}")
     public ResponseEntity<?> crearContacto(@PathVariable Long idCliente, @Valid @RequestBody Contacto contacto, BindingResult result) {
         if (result.hasErrors()) {

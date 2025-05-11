@@ -48,6 +48,10 @@ public class SecurityConfig {
                 .requestMatchers("/api/asignaciones/{idAsignacion}").permitAll()
 
 
+                // Asignaciones de clientes
+                .requestMatchers(HttpMethod.GET,"/api/asignaciones/cliente/{idCliente}").permitAll()
+
+
 
                 // Clientes
 
@@ -56,11 +60,13 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST,"/api/clientes/asignar/{idCliente}/usuario/{idUsuario}").permitAll()
                 .requestMatchers(HttpMethod.GET,"/api/clientes/usuario/{idUsuario}").permitAll()
 
-
                 // Contactos
 
                 .requestMatchers(HttpMethod.GET,"/api/contactos").permitAll()
                 .requestMatchers(HttpMethod.GET,"/api/contactos/{id}").permitAll()
+                // Contactos por cliente
+                .requestMatchers(HttpMethod.GET,"/api/contactos/cliente/{idCliente}").permitAll()
+
                 .requestMatchers(HttpMethod.POST,"/api/contactos/clientes/{idCliente}").permitAll()
                 .requestMatchers(HttpMethod.PUT,"/api/contactos").permitAll()
                 .requestMatchers(HttpMethod.DELETE,"/api/contactos/{id}").permitAll()
@@ -68,13 +74,18 @@ public class SecurityConfig {
 
                 // Asignaciones Vencimientos
                 .requestMatchers(HttpMethod.GET,"/api/asignaciones-vencimientos").permitAll()
+
+                // Asignaciones Vencimiento por cliente
                 .requestMatchers(HttpMethod.GET,"/api/asignaciones-vencimientos/cliente/{idCliente}").permitAll()
+
+
                 .requestMatchers(HttpMethod.GET,"/api/asignaciones-vencimientos/{idAsignacionVencimiento}").permitAll()
                 .requestMatchers(HttpMethod.PUT,"/api/asignaciones-vencimientos/{idAsignacionVencimiento}").permitAll()
                 .requestMatchers(HttpMethod.POST,"/api/asignaciones-vencimientos/enviar-notificacion").permitAll()
 
                 // Usuarios
                 .requestMatchers(HttpMethod.POST,"/api/usuarios").permitAll()
+                .requestMatchers(HttpMethod.GET,"/api/usuarios").permitAll()
 
 
                 .anyRequest().authenticated()

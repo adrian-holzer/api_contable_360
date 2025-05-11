@@ -14,6 +14,7 @@ public interface AsignacionRepository extends JpaRepository<Asignacion, Long> {
     // Métodos adicionales si necesitas consultas personalizadas
 
 
-    List<Asignacion> findByClienteAndObligacion(Cliente c, Obligacion o );
+    List<Asignacion> findByClienteAndObligacionAndActivo(Cliente c, Obligacion o ,boolean estado);
+    List<Asignacion> findByClienteAndActivo(Cliente c,boolean activo);
 
 }
