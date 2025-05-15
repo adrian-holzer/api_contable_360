@@ -64,9 +64,9 @@ public class AsignacionService {
     }
 
 
-    public List<Asignacion> findByClienteIdAndObligacionIdAndActivo(Cliente c, Obligacion o,boolean activo) {
+    public List<Asignacion> findByClienteIdAndObligacionId(Cliente c, Obligacion o) {
 
-        return asignacionRepository.findByClienteAndObligacionAndActivo(c, o,activo);
+        return asignacionRepository.findByClienteAndObligacion(c, o);
     }
 
     public void deleteAsignacion(Long id) {

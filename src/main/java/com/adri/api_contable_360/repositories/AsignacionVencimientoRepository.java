@@ -2,6 +2,7 @@ package com.adri.api_contable_360.repositories;
 
 import com.adri.api_contable_360.models.Asignacion;
 import com.adri.api_contable_360.models.AsignacionVencimiento;
+import com.adri.api_contable_360.models.Vencimiento;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,8 +20,10 @@ public interface AsignacionVencimientoRepository extends JpaRepository<Asignacio
             "JOIN av.vencimiento v " +
             "JOIN av.asignacion a " +
             "JOIN a.cliente c " +
+            "WHERE a.activo = true " + // Agregamos la condición para filtrar por activo = true
             "ORDER BY v.fechaVencimiento ASC")
     List<AsignacionVencimiento> findAllOrderByFechaVencimientoAsc();
+
 
     @Query("SELECT av FROM AsignacionVencimiento av " +
             "JOIN av.vencimiento v " +
@@ -30,7 +33,7 @@ public interface AsignacionVencimientoRepository extends JpaRepository<Asignacio
             "ORDER BY v.fechaVencimiento ASC")
     List<AsignacionVencimiento> findByCliente_IdOrderByFechaVencimientoAsc(@Param("idCliente") Long idCliente);
 
-
+    List<AsignacionVencimiento> findByVencimiento(Vencimiento vencimiento); // Nuevo método
 
 
 

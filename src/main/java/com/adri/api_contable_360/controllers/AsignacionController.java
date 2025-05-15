@@ -66,10 +66,9 @@ public class AsignacionController {
             Obligacion obligacion = obligacionService.findById(idObligacion);
             if (obligacion != null) {
                 // Verificar si ya existe una asignación para este cliente y obligación
-                List<Asignacion> asignacionesExistentes = asignacionService.findByClienteIdAndObligacionIdAndActivo(
+                List<Asignacion> asignacionesExistentes = asignacionService.findByClienteIdAndObligacionId(
                         cliente,
-                        obligacion,
-                        true
+                        obligacion
                 );
 
                 if (asignacionesExistentes.isEmpty()) {
@@ -90,8 +89,9 @@ public class AsignacionController {
                     asignacionService.crearAsignacionesVencimiento(asignacionGuardada, vencimientos);
 
                 } else {
-                    errores.add("Ya existe una asignación para el Cliente ID: " + cliente.getIdCliente() +
-                            " y la Obligación ID: " + obligacion.getId());
+                    asignacionesExistentes.get(0).setActivo(true);
+                    asignacionService.save(asignacionesExistentes.get(0));
+
                 }
             } else {
                 errores.add("No se encontró la obligación con ID: " + idObligacion);

@@ -1,10 +1,19 @@
 package com.adri.api_contable_360.dto;
 
+import java.time.Year;
+
 public class VencimientoDTO {
     private Integer mes;
     private Integer dia;
     private Integer terminacionCuit;
+    private Integer anio;
 
+
+
+
+    public VencimientoDTO() {
+        this.anio = Year.now().getValue();
+    }
     // Getters y setters
 
     public Integer getMes() {
@@ -31,5 +40,11 @@ public class VencimientoDTO {
         this.terminacionCuit = terminacionCuit;
     }
 
+    public Integer getAnio() {
+        return anio;
+    }
 
+    public void setAnio(Integer anio) {
+        this.anio = anio;
+    }
 }

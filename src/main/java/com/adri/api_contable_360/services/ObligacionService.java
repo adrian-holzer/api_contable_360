@@ -37,6 +37,29 @@ public class ObligacionService {
                 return;
             }
 
+            // Leer el año desde la primera celda (fila 0, columna 0)
+            int anio = 0;
+            Cell anioCell = headerRow.getCell(0); // Obtener la primera celda
+            if (anioCell != null) {
+                if (anioCell.getCellType() == CellType.NUMERIC) {
+                    anio = (int) anioCell.getNumericCellValue();
+                } else if (anioCell.getCellType() == CellType.STRING) {
+                    try {
+                        anio = Integer.parseInt(anioCell.getStringCellValue().trim());
+                    } catch (NumberFormatException e) {
+                        System.err.println("Error: No se pudo convertir el año desde la celda: " + anioCell.getStringCellValue());
+                        // Aquí podrías decidir si quieres lanzar una excepción o usar un valor por defecto
+                        anio = 0; // o lanzar una excepción
+                    }
+                }
+            }
+            if(anio == 0){
+                System.err.println("Error: No se pudo obtener el año desde la primera celda. Se usará el año actual.");
+                anio = Year.now().getValue();
+            }
+
+            System.out.println("Año leído desde el Excel: " + anio);
+
             List<String> obligacionHeaders = new ArrayList<>();
             List<Integer> obligacionColumnStarts = new ArrayList<>();
 
@@ -92,10 +115,11 @@ public class ObligacionService {
                                 vencimiento.setObligacion(obligacion);
                                 vencimiento.setTerminacionCuit(j);
                                 vencimiento.setMes(mes);
+                                vencimiento.setAnio(anio);
                                 vencimiento.setDia(terminacionDia);
 
                                 try {
-                                    vencimiento.setFechaVencimiento(LocalDate.of(Year.now().getValue(), vencimiento.getMes(), vencimiento.getDia()));
+                                    vencimiento.setFechaVencimiento(LocalDate.of(anio, vencimiento.getMes(), vencimiento.getDia()));
                                 } catch (Exception e) {
                                     // Manejar casos de fechas inválidas (ej: día 31 en mes de 30)
                                     vencimiento.setFechaVencimiento(null); // O podrías usar otra estrategia
@@ -178,7 +202,7 @@ public class ObligacionService {
 
 
 
-    @Transactional
+
     public Obligacion crearObligacion(Obligacion obligacion) {
         return obligacionRepository.save(obligacion);
     }

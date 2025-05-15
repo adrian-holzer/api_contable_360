@@ -17,6 +17,7 @@ public class Vencimiento {
     private Integer terminacionCuit;
     private Integer mes;
     private Integer dia;
+    private Integer anio;
     private String observaciones;
     private LocalDate fechaVencimiento; // Nuevo campo para la fecha de vencimiento
 
@@ -75,5 +76,13 @@ public class Vencimiento {
 
     public void setObservaciones(String observaciones) {
         this.observaciones = observaciones;
+    }
+
+    public Integer getAnio() {
+        return anio;
+    }
+
+    public void setAnio(Integer anio) {
+        this.anio = anio;
     }
 }

@@ -13,7 +13,6 @@ public interface VencimientoRepository extends JpaRepository<Vencimiento, Long> 
     List<Vencimiento> findByMesAndDia(Integer mes, Integer dia);
 
 
-    @Transactional
     void deleteByObligacion(Obligacion obligacion); // Nuevo método para eliminar por la entidad Obligacion
 
 
