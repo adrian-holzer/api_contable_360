@@ -2,14 +2,17 @@ package com.adri.api_contable_360.controllers;
 
 import com.adri.api_contable_360.dto.ObligacionRequestDTO;
 import com.adri.api_contable_360.dto.VencimientoDTO;
+import com.adri.api_contable_360.models.Asignacion;
 import com.adri.api_contable_360.models.AsignacionVencimiento;
 import com.adri.api_contable_360.models.Obligacion;
 import com.adri.api_contable_360.models.Vencimiento;
+import com.adri.api_contable_360.repositories.AsignacionRepository;
 import com.adri.api_contable_360.repositories.AsignacionVencimientoRepository;
 import com.adri.api_contable_360.repositories.ObligacionRepository;
 import com.adri.api_contable_360.repositories.VencimientoRepository;
 import com.adri.api_contable_360.services.ObligacionService;
 import com.adri.api_contable_360.services.VencimientoService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +26,7 @@ import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -45,6 +49,9 @@ public class ObligacionController {
     @Autowired
     private VencimientoRepository vencimientoRepository;
 
+    @Autowired
+    private AsignacionRepository asignacionRepository;
+
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadExcel(@RequestParam("file") MultipartFile file) {
@@ -60,8 +67,8 @@ public class ObligacionController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Obligacion>> listarObligaciones() {
-        return ResponseEntity.ok(obligacionRepository.findAll());
+    public ResponseEntity<List<Obligacion>> listarObligacionesActivas() {
+        return ResponseEntity.ok(obligacionRepository.findByActivo(true));
     }
 
 
@@ -89,7 +96,7 @@ public class ObligacionController {
         nuevaObligacion.setNombre(obligacionRequest.getNombre());
         nuevaObligacion.setDescripcion(obligacionRequest.getDescripcion());
         nuevaObligacion.setObservaciones(obligacionRequest.getObservaciones());
-
+        nuevaObligacion.setActivo(true);
         List<Vencimiento> vencimientos = new ArrayList<>();
         for (VencimientoDTO vencimientoDTO : obligacionRequest.getVencimientos()) {
             Integer anio = vencimientoDTO.getAnio() != null ? vencimientoDTO.getAnio() : Year.now().getValue();
@@ -106,6 +113,7 @@ public class ObligacionController {
                 vencimiento.setFechaVencimiento(fechaVencimiento);
                 vencimientos.add(vencimiento);
             } catch (Exception e) {
+
                 YearMonth yearMonth = YearMonth.of(anio, mes);
                 int ultimoDiaDelMes = yearMonth.lengthOfMonth();
                 if (dia > ultimoDiaDelMes) {
@@ -114,6 +122,8 @@ public class ObligacionController {
                             .body("Día inválido para el mes y año : Año=" + anio + " Mes=" + mes + ", Día=" + dia + " (El último día del mes es: " + ultimoDiaDelMes + ")"); // Devuelve null en el body para indicar el error, o puedes crear un DTO para el error
                 }
                 else {
+
+
                     Vencimiento vencimiento = new Vencimiento();
                     vencimiento.setMes(mes);
                     vencimiento.setTerminacionCuit(vencimientoDTO.getTerminacionCuit());
@@ -165,6 +175,7 @@ public class ObligacionController {
                 nuevoVencimiento.setTerminacionCuit(vencimientoDTO.getTerminacionCuit());
                 nuevoVencimiento.setDia(vencimientoDTO.getDia());
                 nuevoVencimiento.setObligacion(obligacionExistente);
+                nuevoVencimiento.setAnio(Year.now().getValue());
                 vencimientosActualizados.add(nuevoVencimiento);
             }
         }
@@ -224,6 +235,37 @@ public class ObligacionController {
     }
 
 
+    @DeleteMapping("/{id}")
+    @Transactional // Para manejar la transacción de forma declarativa
+    public ResponseEntity<String> eliminarObligacion(@PathVariable Long id) {
+        Optional<Obligacion> obligacionOptional = obligacionRepository.findById(id);
 
+        if (!obligacionOptional.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encontró la obligación con ID: " + id);
+        }
+
+        Obligacion obligacion = obligacionOptional.get();
+
+        // Verificar si existen asignaciones asociadas
+        List<Asignacion> asignaciones = asignacionRepository.findByObligacion(obligacion); // Usa el nombre correcto de la propiedad
+
+        if (!asignaciones.isEmpty()) {
+            // Si hay asignaciones, desactivarlas
+            for (Asignacion asignacion : asignaciones) {
+                asignacion.setActivo(false);
+                asignacionRepository.save(asignacion);
+            }
+            // Desactivar la obligación
+            obligacion.setActivo(false);
+            obligacionRepository.save(obligacion);
+            return ResponseEntity.ok("Obligación desactivada y asignaciones asociadas inactivadas.");
+        } else {
+            // Si no hay asignaciones, eliminar la obligación y sus vencimientos
+            // Primero eliminamos los vencimientos asociados a la obligación
+            vencimientoRepository.deleteByObligacion(obligacion); // Asegúrate de que este método exista en tu VencimientoRepository
+            obligacionRepository.delete(obligacion);
+            return ResponseEntity.ok("Obligación y vencimientos eliminados.");
+        }
+    }
 
 }

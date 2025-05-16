@@ -14,9 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/asignaciones")
@@ -62,37 +60,42 @@ public class AsignacionController {
         List<Asignacion> asignacionesCreadas = new ArrayList<>();
         List<String> errores = new ArrayList<>();
 
-        for (Long idObligacion : idsObligaciones) {
+        // Obtener todas las asignaciones existentes para este cliente
+        List<Asignacion> asignacionesExistentesCliente = asignacionService.findByCliente(cliente);
+
+        // Crear un conjunto con los IDs de las obligaciones que SÍ se deben asignar (activas)
+        Set<Long> obligacionesAActivar = new HashSet<>(idsObligaciones);
+
+        // Iterar sobre las asignaciones existentes del cliente para actualizar el campo activo
+        for (Asignacion asignacionExistente : asignacionesExistentesCliente) {
+            if (obligacionesAActivar.contains(asignacionExistente.getObligacion().getId())) {
+                // La obligación todavía está seleccionada, se mantiene activa
+                asignacionExistente.setActivo(true);
+                asignacionService.save(asignacionExistente);
+                obligacionesAActivar.remove(asignacionExistente.getObligacion().getId()); // Para que no se creen duplicados
+            } else {
+                // La obligación ya no está seleccionada, se desactiva
+                asignacionExistente.setActivo(false);
+                asignacionService.save(asignacionExistente);
+            }
+        }
+
+
+        // Crear las nuevas asignaciones para las obligaciones que NO existían previamente
+        for (Long idObligacion : obligacionesAActivar) {
             Obligacion obligacion = obligacionService.findById(idObligacion);
             if (obligacion != null) {
-                // Verificar si ya existe una asignación para este cliente y obligación
-                List<Asignacion> asignacionesExistentes = asignacionService.findByClienteIdAndObligacionId(
-                        cliente,
-                        obligacion
+                Asignacion nuevaAsignacion = new Asignacion();
+                nuevaAsignacion.setCliente(cliente);
+                nuevaAsignacion.setObligacion(obligacion);
+                nuevaAsignacion.setObservacion(asignacionRequest.getObservacion());
+                nuevaAsignacion.setActivo(true);
+                Asignacion asignacionGuardada = asignacionService.save(nuevaAsignacion);
+                asignacionesCreadas.add(asignacionGuardada);
+                List<Vencimiento> vencimientos = vencimientoService.obtenerVencimientosPorObligacionYTerminacionCuit(
+                        asignacionGuardada.getIdAsignacion()
                 );
-
-                if (asignacionesExistentes.isEmpty()) {
-                    Asignacion nuevaAsignacion = new Asignacion();
-                    nuevaAsignacion.setCliente(cliente);
-                    nuevaAsignacion.setObligacion(obligacion);
-                    nuevaAsignacion.setObservacion(asignacionRequest.getObservacion());
-                    nuevaAsignacion.setActivo(true);
-
-                    Asignacion asignacionGuardada = asignacionService.save(nuevaAsignacion);
-                    asignacionesCreadas.add(asignacionGuardada);
-
-                    // Crear las AsignacionVencimiento para esta asignación
-                    // Asumo que tienes un método en VencimientoService para esto
-                    List<Vencimiento> vencimientos = vencimientoService.obtenerVencimientosPorObligacionYTerminacionCuit(
-                            asignacionGuardada.getIdAsignacion() // Aquí deberías usar los IDs de Obligacion y Cliente
-                    );
-                    asignacionService.crearAsignacionesVencimiento(asignacionGuardada, vencimientos);
-
-                } else {
-                    asignacionesExistentes.get(0).setActivo(true);
-                    asignacionService.save(asignacionesExistentes.get(0));
-
-                }
+                asignacionService.crearAsignacionesVencimiento(asignacionGuardada, vencimientos);
             } else {
                 errores.add("No se encontró la obligación con ID: " + idObligacion);
             }
@@ -101,12 +104,12 @@ public class AsignacionController {
         if (!errores.isEmpty() && asignacionesCreadas.isEmpty()) {
             return new ResponseEntity<>(errores, HttpStatus.CONFLICT);
         } else if (!errores.isEmpty()) {
-            // Si se crearon algunas asignaciones pero hubo duplicados
-            return new ResponseEntity<>(errores,HttpStatus.MULTI_STATUS); // Puedes personalizar el cuerpo de la respuesta si lo deseas
+            return new ResponseEntity<>(errores, HttpStatus.MULTI_STATUS);
         } else {
             return new ResponseEntity<>(asignacionesCreadas, HttpStatus.CREATED);
         }
     }
+
 
 
 

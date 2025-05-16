@@ -32,6 +32,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST,"/api/obligaciones").permitAll()
                 .requestMatchers(HttpMethod.GET,"/api/obligaciones/{idObligacion}").permitAll()
                 .requestMatchers(HttpMethod.PUT,"/api/obligaciones/{id}").permitAll()
+                .requestMatchers(HttpMethod.DELETE,"/api/obligaciones/{id}").permitAll()
 
                 /// Vencimientos
 

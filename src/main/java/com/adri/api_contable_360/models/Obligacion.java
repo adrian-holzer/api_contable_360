@@ -14,6 +14,7 @@ public class Obligacion {
     private String nombre;
     private String descripcion;
     private String observaciones;
+    private boolean activo;
 
     @OneToMany(mappedBy = "obligacion", cascade = CascadeType.ALL)
     @JsonIgnore // Ignorar esta lista durante la serialización
@@ -60,5 +61,13 @@ public class Obligacion {
 
     public void setVencimientos(List<Vencimiento> vencimientos) {
         this.vencimientos = vencimientos;
+    }
+
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
     }
 }

@@ -102,6 +102,7 @@ public class ObligacionService {
                     Obligacion obligacion = obligacionesMap.computeIfAbsent(obligacionNombre, nombre -> {
                         Obligacion o = new Obligacion();
                         o.setNombre(nombre);
+                        o.setActivo(true);
                         return obligacionRepository.save(o);
                     });
 

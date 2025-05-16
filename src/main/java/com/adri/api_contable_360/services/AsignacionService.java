@@ -38,6 +38,10 @@ public class AsignacionService {
         return asignacionRepository.save(asignacion);
     }
 
+    public List<Asignacion> findByCliente(Cliente c) {
+        return asignacionRepository.findByCliente(c);
+    }
+
 
     @Transactional
     public void crearAsignacionesVencimiento(Asignacion asignacion, List<Vencimiento> vencimientos) {
