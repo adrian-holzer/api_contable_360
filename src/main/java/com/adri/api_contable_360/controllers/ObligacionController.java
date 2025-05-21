@@ -2,10 +2,7 @@ package com.adri.api_contable_360.controllers;
 
 import com.adri.api_contable_360.dto.ObligacionRequestDTO;
 import com.adri.api_contable_360.dto.VencimientoDTO;
-import com.adri.api_contable_360.models.Asignacion;
-import com.adri.api_contable_360.models.AsignacionVencimiento;
-import com.adri.api_contable_360.models.Obligacion;
-import com.adri.api_contable_360.models.Vencimiento;
+import com.adri.api_contable_360.models.*;
 import com.adri.api_contable_360.repositories.AsignacionRepository;
 import com.adri.api_contable_360.repositories.AsignacionVencimientoRepository;
 import com.adri.api_contable_360.repositories.ObligacionRepository;
@@ -51,7 +48,6 @@ public class ObligacionController {
 
     @Autowired
     private AsignacionRepository asignacionRepository;
-
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadExcel(@RequestParam("file") MultipartFile file) {
@@ -176,7 +172,54 @@ public class ObligacionController {
                 nuevoVencimiento.setDia(vencimientoDTO.getDia());
                 nuevoVencimiento.setObligacion(obligacionExistente);
                 nuevoVencimiento.setAnio(Year.now().getValue());
-                vencimientosActualizados.add(nuevoVencimiento);
+
+                try {
+                    nuevoVencimiento.setFechaVencimiento(LocalDate.of(nuevoVencimiento.getAnio(), nuevoVencimiento.getMes(), nuevoVencimiento.getDia()));
+                } catch (Exception e) {
+                    // Manejar casos de fechas inválidas (ej: día 31 en mes de 30, febrero 29 en año no bisiesto)
+                    YearMonth yearMonth = YearMonth.of(vencimientoDTO.getAnio(), vencimientoDTO.getMes());
+                    int ultimoDiaDelMes = yearMonth.lengthOfMonth();
+                    if (vencimientoDTO.getDia() > ultimoDiaDelMes) {
+                        return ResponseEntity
+                                .status(HttpStatus.BAD_REQUEST)
+                                .body("Día inválido para el mes y año proporcionados en la obligación " + obligacionExistente.getNombre() +
+                                        ": Año=" + vencimientoDTO.getAnio() + " Mes=" + vencimientoDTO.getMes() + ", Día=" + vencimientoDTO.getDia() + " (El último día del mes es: " + ultimoDiaDelMes + ")");
+                    } else {
+                        nuevoVencimiento.setFechaVencimiento(null);
+                    }
+                }
+                vencimientoRepository.save(nuevoVencimiento);
+                //vencimientosActualizados.add(nuevoVencimiento);
+
+
+
+                // Buscar todas las asignaciones para esa obligacion y que la terminacion de cuit coincida con el cliente
+
+                List<Asignacion> asignaciones = asignacionRepository.findByObligacionAndClienteTerminacionCuitAndActivo(obligacionExistente,vencimientoDTO.getTerminacionCuit());
+
+                if (!asignaciones.isEmpty()) {
+                    // Por cada asignacion crear una asignacion vencimientos asociado la asignacion con el nuevo vencimiento
+                    for (Asignacion asignacion : asignaciones) {
+                        AsignacionVencimiento asignacionVencimiento = new AsignacionVencimiento();
+                        asignacionVencimiento.setAsignacion(asignacion);     // Asocia la asignación encontrada
+                        asignacionVencimiento.setVencimiento(nuevoVencimiento); // Asocia el nuevo vencimiento guardado
+                        asignacionVencimiento.setEstado(EstadoAsignacion.PENDIENTE); // Establece el estado inicial
+
+                        // Puedes setear otras propiedades si es necesario, como observacion inicial, usuarioFinalizo, etc.
+                        asignacionVencimientoRepository.save(asignacionVencimiento); // Guarda la nueva AsignacionVencimiento
+                        System.out.println("Creada AsignacionVencimiento para Asignacion ID: " + asignacion.getIdAsignacion() +
+                                " y Vencimiento ID: " + nuevoVencimiento.getId());
+                    }
+                } else {
+                    System.out.println("No se encontraron asignaciones activas para la obligación " + obligacionExistente.getNombre() +
+                            " y terminación CUIT " + vencimientoDTO.getTerminacionCuit());
+                }
+
+
+
+
+
+
             }
         }
 

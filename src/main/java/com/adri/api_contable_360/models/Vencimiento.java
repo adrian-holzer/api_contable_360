@@ -1,8 +1,10 @@
 package com.adri.api_contable_360.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 public class Vencimiento {
@@ -21,7 +23,9 @@ public class Vencimiento {
     private String observaciones;
     private LocalDate fechaVencimiento; // Nuevo campo para la fecha de vencimiento
 
-    // Getters y setters
+    @OneToMany(mappedBy = "vencimiento", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore // Ignora esta propiedad al serializar a JSON
+    private List<AsignacionVencimiento> asignacionesVencimientos;
 
     public LocalDate getFechaVencimiento() {
         return fechaVencimiento;
@@ -84,5 +88,13 @@ public class Vencimiento {
 
     public void setAnio(Integer anio) {
         this.anio = anio;
+    }
+
+    public List<AsignacionVencimiento> getAsignacionesVencimientos() {
+        return asignacionesVencimientos;
+    }
+
+    public void setAsignacionesVencimientos(List<AsignacionVencimiento> asignacionesVencimientos) {
+        this.asignacionesVencimientos = asignacionesVencimientos;
     }
 }

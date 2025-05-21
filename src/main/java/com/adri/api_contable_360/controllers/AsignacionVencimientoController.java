@@ -96,4 +96,15 @@ public class AsignacionVencimientoController {
         }
     }
 
+
+
+
+    @GetMapping("/proximas-a-vencer")
+    public ResponseEntity<List<AsignacionVencimiento>> listarAsignacionesProximasAVencer() {
+        List<AsignacionVencimiento> asignacionesProximasAVencer = asignacionVencimientoService.getAsignacionesProximasAVencer();
+        if (asignacionesProximasAVencer.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(asignacionesProximasAVencer, HttpStatus.OK);
+    }
 }

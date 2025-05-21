@@ -80,6 +80,12 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET,"/api/asignaciones-vencimientos/cliente/{idCliente}").permitAll()
 
 
+                // Proximas a vencer
+
+                .requestMatchers(HttpMethod.GET,"/api/asignaciones-vencimientos/proximas-a-vencer").permitAll()
+
+
+
                 .requestMatchers(HttpMethod.GET,"/api/asignaciones-vencimientos/{idAsignacionVencimiento}").permitAll()
                 .requestMatchers(HttpMethod.PUT,"/api/asignaciones-vencimientos/{idAsignacionVencimiento}").permitAll()
                 .requestMatchers(HttpMethod.POST,"/api/asignaciones-vencimientos/enviar-notificacion").permitAll()

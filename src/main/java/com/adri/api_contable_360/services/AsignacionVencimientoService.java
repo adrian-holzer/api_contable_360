@@ -131,4 +131,12 @@ public class AsignacionVencimientoService {
         }
     }
 
+
+
+    public List<AsignacionVencimiento> getAsignacionesProximasAVencer() {
+        LocalDate hoy = LocalDate.now();
+        LocalDate diezDiasDespues = hoy.plusDays(10);
+        return asignacionVencimientoRepository.findProximasAVencer(hoy, diezDiasDespues,EstadoAsignacion.PENDIENTE);
+    }
+
 }
