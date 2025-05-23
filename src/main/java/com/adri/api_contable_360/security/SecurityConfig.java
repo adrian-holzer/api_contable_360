@@ -108,7 +108,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("capacitor://localhost", "https://localhost", "http://localhost:5173")); // Origen permitido List.of("http://localhost:5173","https://frontspa.netlify.app/")
+        config.setAllowedOrigins(List.of("capacitor://localhost", "https://localhost", "http://localhost:5173","https://teal-figolla-377874.netlify.app")); // Origen permitido List.of("http://localhost:5173","https://frontspa.netlify.app/")
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
