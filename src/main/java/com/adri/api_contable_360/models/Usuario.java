@@ -3,6 +3,7 @@ package com.adri.api_contable_360.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 @Entity
 public class Usuario {
@@ -28,6 +29,20 @@ public class Usuario {
     @OneToMany(mappedBy = "usuarioFinalizo")
     @JsonIgnore
     private List<AsignacionVencimiento> asignacionesVencimientosFinalizadas;
+
+
+
+
+    //Usamos fetchType en EAGER para que cada vez que se acceda o se extraiga un usuario de la BD, este se traiga todos sus roles
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    /*Con JoinTable estaremos creando una tabla que unirá la tabla de usuario y role, con lo cual tendremos un total de 3 tablas
+    relacionadas en la tabla "usuarios_roles", a través de sus columnas usuario_id que apuntara al ID de la tabla usuario
+    y role_id que apuntara al Id de la tabla role */
+    @JoinTable(name = "usuario_roles", joinColumns = @JoinColumn(name = "usuario_id", referencedColumnName = "idUsuario")
+            ,inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id_role"))
+    private List<Roles> roles = new ArrayList<>();
+
+
 
     // Constructor por defecto (necesario para JPA)
     public Usuario() {
@@ -105,5 +120,13 @@ public class Usuario {
 
     public void setAsignacionesVencimientosFinalizadas(List<AsignacionVencimiento> asignacionesVencimientosFinalizadas) {
         this.asignacionesVencimientosFinalizadas = asignacionesVencimientosFinalizadas;
+    }
+
+    public List<Roles> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<Roles> roles) {
+        this.roles = roles;
     }
 }
