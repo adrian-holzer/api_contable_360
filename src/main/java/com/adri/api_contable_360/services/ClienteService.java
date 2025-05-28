@@ -66,13 +66,11 @@ public class ClienteService {
 
         Cliente cliente = clienteOptional.get();
 
-        if (cliente.getUsuarioResponsable() == null) {
+
             cliente.setUsuarioResponsable(usuarioOptional.get());
             clienteRepository.save(cliente);
             return new ResponseEntity<>("Cliente asignado al usuario exitosamente", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("El cliente ya tiene un usuario asignado", HttpStatus.CONFLICT);
-        }
+
     }
 
 

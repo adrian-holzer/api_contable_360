@@ -65,6 +65,7 @@ public class AsignacionVencimientoService {
                     // Si el estado se cambia a FINALIZADO, establecer la fecha actual
                     if (estado == EstadoAsignacion.FINALIZADO) {
                         asignacionVencimiento.setFechaFinalizacion(LocalDate.now());
+                        asignacionVencimiento.setUsuarioFinalizo(asignacionVencimiento.getAsignacion().getCliente().getUsuarioResponsable());
                     } else if (nuevoEstado.toUpperCase().equals("PENDIENTE")) {
                         // Si vuelve a pendiente, podrías limpiar la fecha de finalización (opcional)
                         asignacionVencimiento.setFechaFinalizacion(null);
